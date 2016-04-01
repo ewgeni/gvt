@@ -79,9 +79,9 @@ AnimatedObject.prototype.loadImage = function () {
     if (this.currentFrame < 0) {
         this.currentFrame = this.spriteImages.length - 1;
     }
-
+    //debugger;
     var self = this;
-    var dir = '../images/';
+    var dir = 'images/';
     var imgSrc = dir + this.spriteImages[this.currentFrame];
     var currentImage = new Image();
 
