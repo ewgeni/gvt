@@ -15,7 +15,7 @@
     var vertexShaderSource = [
         'attribute vec2 pos;',
         'void main() {',
-            'gl_Position = vec4(pos * 0.5, 0, 1);', 
+            'gl_Position = vec4( pos.x * 0.3 + 0.4, pos.y * 0.5 + 0.2,  0, 1);', 
         '}',
     ].join("\n");
 
@@ -26,7 +26,7 @@
     // compile a fragment shader
     var fragmentShaderSource = [
         'void main() {',
-            'gl_FragColor = vec4(1);',
+            'gl_FragColor = vec4(0.2, 0.7, 0.5, 1);',
         '}',
     ].join("\n");
 
