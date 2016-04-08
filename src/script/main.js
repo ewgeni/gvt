@@ -1,13 +1,18 @@
-﻿function initWebGL() {
+﻿var gl = null;
+
+function initWebGL() {
 
     var canvas = document.getElementById('canvas');
-    console.log(canvas);
+
     try {
-        var gl = canvas.getContext('webgl');
+        gl = canvas.getContext('webgl');
+        run();
     } catch (e) {
         console.log('WebGL context not found!');
     }
+}
 
+function run() {
     //pipline setup
     gl.clearColor(0, 0, 0, 1);
 
@@ -43,7 +48,7 @@
     gl.useProgram(prog);
 
     //load vertex data into a buffer
-    var vertices = new Float32Array([1, 1, -1, 1, 1, -1, -1, -1]);
+    var vertices = new Float32Array([-1, 1, 1, 1, 1, -1, -1, -1]);
     var vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
@@ -55,5 +60,5 @@
 
     //clear framebuffer and render primitives
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.drawArrays(gl.LINE_LOOP, 0, 4);
 }
