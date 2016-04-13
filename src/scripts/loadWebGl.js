@@ -45,7 +45,7 @@ function load() {
         gl.linkProgram(prog);
         gl.useProgram(prog);
 
-        var lineStripVerticies = new Float32Array([-1, -1, -1, 0.6,
+        var lineLoopVerticies = new Float32Array([-1, -1, -1, 0.6,
                                                      1, 0.6, 1, -1,
                                                      -1, 0.6, 0, 1,
                                                      1, 0.6, -1, -1,
@@ -54,7 +54,7 @@ function load() {
 
         var vBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, lineStripVerticies, gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, lineLoopVerticies, gl.STATIC_DRAW);
 
         // bind vertex buffer to attribute variable
         var vertexShaderPosAttribute = gl.getAttribLocation(prog, 'pos');
@@ -64,6 +64,6 @@ function load() {
         //clear framebuffer and render primitives
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.lineWidth(10); //windows bug. since windows is rendering via the ANGLE library. 
-        gl.drawArrays(gl.LINE_STRIP, 0, ( lineStripVerticies.length / 2 ) );
+        gl.drawArrays(gl.LINE_LOOP, 0, (lineLoopVerticies.length / 2));
     }
 //});
