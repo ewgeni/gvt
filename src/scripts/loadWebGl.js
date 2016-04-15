@@ -15,6 +15,11 @@ function load() {
         //pipline setup
         gl.clearColor(1, 1, 1, 1);
 
+        //culling options
+        gl.frontFace(gl.CCW); // default CCW, therefore optional
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
+
         var vertexShaderSource = [
             "attribute vec2 pos;",
             "void main() {",
@@ -47,8 +52,12 @@ function load() {
 
         var trianglesVerticies = new Float32Array([
                                                      0, 1, -1, 0.6, 1, 0.6,
-                                                     1, 0.6, -1, -1, 1, -1,
-                                                    -1, 0.6, -1, -1, 1, 0.6
+                                                     1, 0.6, 0.2, 0.6, 0.2, -1,
+                                                     0.2, -1, 1, -1, 1, 0.6,
+                                                     0.2, 0.6, -0.2, 0.6, 0.2, -0.4,
+                                                     -0.2, 0.6, -0.2, -0.4, 0.2, -0.4,
+                                                     -0.2, 0.6, -1, 0.6, -1, -1,
+                                                     -1, -1, -0.2, -1, -0.2, 0.6
         ]);
 
         var vBuffer = gl.createBuffer();
@@ -59,11 +68,7 @@ function load() {
         var vertexShaderPosAttribute = gl.getAttribLocation(prog, 'pos');
         gl.vertexAttribPointer(vertexShaderPosAttribute, 2, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vertexShaderPosAttribute);
-
-        //culling options
-        gl.frontFace(gl.CCW); // default CCW, therefore optional
-        gl.enable(gl.CULL_FACE);
-        gl.cullFace(gl.BACK);
+ 
 
         //clear framebuffer and render primitives
         gl.clear(gl.COLOR_BUFFER_BIT);
