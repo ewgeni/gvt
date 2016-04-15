@@ -55,6 +55,11 @@ function load() {
         var vertexShaderPosAttribute = gl.getAttribLocation(prog, 'pos');
         gl.vertexAttribPointer(vertexShaderPosAttribute, 2, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vertexShaderPosAttribute);
+        
+        //culface options
+        gl.frontFace(gl.CCW); // optional
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.FRONT);
 
         //clear framebuffer and render primitives
         gl.clear(gl.COLOR_BUFFER_BIT);
