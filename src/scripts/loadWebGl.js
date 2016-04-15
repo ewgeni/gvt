@@ -45,7 +45,7 @@ function load() {
         gl.linkProgram(prog);
         gl.useProgram(prog);
 
-        var triangleStripVerticies = new Float32Array([1, -1, -1, -1, 1, 0.6, -1, 0.6, 0, 1]);
+        var triangleStripVerticies = new Float32Array([-1, -1, 1, -1, -1, 0.6, 1, 0.6, 0, 1]);
 
         var vBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
@@ -55,6 +55,11 @@ function load() {
         var vertexShaderPosAttribute = gl.getAttribLocation(prog, 'pos');
         gl.vertexAttribPointer(vertexShaderPosAttribute, 2, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vertexShaderPosAttribute);
+
+        //culling option
+        gl.frontFace(gl.CCW);// optional
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
 
         //clear framebuffer and render primitives
         gl.clear(gl.COLOR_BUFFER_BIT);
