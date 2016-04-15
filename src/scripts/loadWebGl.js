@@ -59,7 +59,7 @@ function load() {
         //culling option
         gl.frontFace(gl.CCW);// optional
         gl.enable(gl.CULL_FACE);
-        gl.cullFace(gl.BACK);
+        gl.cullFace(gl.FRONT);
 
         //clear framebuffer and render primitives
         gl.clear(gl.COLOR_BUFFER_BIT);
