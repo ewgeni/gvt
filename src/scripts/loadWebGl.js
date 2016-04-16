@@ -50,28 +50,32 @@ function load() {
         gl.linkProgram(prog);
         gl.useProgram(prog);
 
-        var triangleStripeVerticies = new Float32Array([
-                                                     -0.2,  -1,   -0.2,  -0.4,  -1,    -1,
-                                                     -1,     0.6, -1,     0.6,  -0.2,  -0.4,
-                                                      0,     1,    0.2,  -0.4,   1,     0.6,
-                                                      1,    -1,    1,    -1,     0.2,  -0.4,
-                                                      0.2,  -1
+        //vertex data
+        var triangleVerticies = new Float32Array([0,1,  -1,0.6,  1,0.6,  -0.2,0.6,  0.2,0.6,  -0.2,-0.4,  0.2,-0.4,  -1,-1,  -0.2,-1,  0.2,-1,  1,-1]);
 
-        ]);
+        //index data
+        var triangleVerticiesIndices = new Uint16Array([0,1,2, 1,7,8, 1,8,3, 3,5,6, 6,4,3, 4,9,10, 10,2,4]);
 
+        //create vertex buffer
         var vBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, triangleStripeVerticies, gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, triangleVerticies, gl.STATIC_DRAW);
 
         // bind vertex buffer to attribute variable
         var vertexShaderPosAttribute = gl.getAttribLocation(prog, 'pos');
         gl.vertexAttribPointer(vertexShaderPosAttribute, 2, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(vertexShaderPosAttribute);
- 
+        
+        // setup index buffer
+        var indexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, triangleVerticiesIndices, gl.STATIC_DRAW);
+        triangleVerticiesIndices.numberOfElements = triangleVerticiesIndices.length;
+
 
         //clear framebuffer and render primitives
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.lineWidth(10); //windows bug. since windows is rendering via the ANGLE library. 
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, (triangleStripeVerticies.length / 2) );
+        gl.drawElements(gl.TRIANGLES, triangleVerticiesIndices.numberOfElements, gl.UNSIGNED_SHORT, 0);
     }
 //});
