@@ -30,7 +30,7 @@ function run() {
         var vertexData = vbos[i][self.VERTEX_KEY];
         var primetiveData = vbos[i][self.PRIMITIVE_KEY];
 
-        gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.DYNAMIC_DRAW);
         gl.drawArrays(primetiveData, 0, vertexData.length / 2);
     }
 }
@@ -43,7 +43,7 @@ function setOptions() {
     //pipline setup
     gl.clearColor(1, 1, 1, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.lineWidth(10); //windows bug. since windows is rendering via the ANGLE library. 
+    //gl.lineWidth(10); //windows bug. since windows is rendering via the ANGLE library. 
 
     //culling options
     gl.frontFace(gl.CCW); // default CCW, therefore optional
