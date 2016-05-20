@@ -1,6 +1,7 @@
 ﻿//require(["shader", "shader!simple.vert"], function (shader, simpleFragShader) {
 var gl = null;
 var prog = null;
+var ibo = null;
 
 var VERTEX_KEY = 'verticies';
 var PRIMITIVE_KEY = 'primitive';
@@ -17,22 +18,16 @@ function load() {
 }
 
 function run() {
+    var verticies, indicies;
 
     setOptions();
     createShadersAndLinkProgram();
+    setVertexData();
     createAndBindVertexBuffer();
-
-    var vbos = getVBOData();
-    var ibos = getIBOData();
-
-    for (var i = 0; i < vbos.length; i++) {
-        
-        var vertexData = vbos[i][self.VERTEX_KEY];
-        var primetiveData = vbos[i][self.PRIMITIVE_KEY];
-
-        gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.DYNAMIC_DRAW);
-        gl.drawArrays(primetiveData, 0, vertexData.length / 2);
-    }
+    createAndBindIndexBuffer();
+    setColor();
+    
+    gl.drawElements(gl.LINE_STRIP, ibo.numberOfElements, gl.UNSIGNED_SHORT, 0);
 }
 
 /**
@@ -57,9 +52,13 @@ creates the vertex and fragment shader and links all to a compiled program
 function createShadersAndLinkProgram() {
 
     var vertexShaderSource = [
-            "attribute vec2 pos;",
+            "attribute vec3 pos;",
+            "attribute vec4 col;",
+            "varying vec4 color;",
+
             "void main() {",
-                "gl_Position = vec4( pos.x, pos.y, 0, 1);",
+                "color = col;",
+                "gl_Position = vec4( pos, 1);",
 	            "gl_PointSize = 10.0;",
             "}"
     ].join("\n");
@@ -69,8 +68,11 @@ function createShadersAndLinkProgram() {
     gl.compileShader(vertexShader);
 
     var fragmentShaderSource = [
+        "precision mediump float;",
+        "varying vec4 color;",
+
         "void main() {",
-            "gl_FragColor = vec4(0, 0, 0, 1);",
+            "gl_FragColor = color;",
         "}"
     ].join("\n");
 
@@ -84,6 +86,7 @@ function createShadersAndLinkProgram() {
         prog = gl.createProgram();
         gl.attachShader(prog, vertexShader);
         gl.attachShader(prog, fragmentShader);
+        gl.bindAttribLocation(prog, 0, "pos");
         gl.linkProgram(prog);
         gl.useProgram(prog);
     } catch (e) {
@@ -99,13 +102,29 @@ function createAndBindVertexBuffer() {
     //create vertex buffer
     var vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, verticies, gl.STATIC_DRAW);
 
     // bind vertex buffer to attribute variable
     var vertexShaderPosAttribute = gl.getAttribLocation(prog, 'pos');
-    gl.vertexAttribPointer(vertexShaderPosAttribute, 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(vertexShaderPosAttribute, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vertexShaderPosAttribute);
 }
 
+/**
+**/
+function createAndBindIndexBuffer() {
+    ibo = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indicies, gl.STATIC_DRAW);
+    ibo.numberOfElements = indicies.length;
+}
+
+/**
+**/
+function setColor() {
+    var colAttrib = gl.getAttribLocation(prog, 'col');
+    gl.vertexAttrib4f(colAttrib, 0, 0, 1, 1);
+}
 
 /**
 get verticies data for all shapes
@@ -224,4 +243,37 @@ function getIBOData() {
 
     //gl.drawElements(gl.LINE_LOOP, lineLoopIBO.numberOfElements, gl.UNSIGNED_SHORT, 0);
 }
+
+function setVertexData() {
+
+    var pointsForOneGeometry = 32;
+    var loops = 5;
+    var maxPoints = pointsForOneGeometry * loops;
+    var dimensions = 3;
+    var fullCircle = 2 * Math.PI;
+
+    verticies = new Float32Array(maxPoints * dimensions);
+    indicies = new Uint16Array(maxPoints);
+
+    var tn = loops * fullCircle;
+    var deltaT = fullCircle / pointsForOneGeometry;
+    var t = 0;
+    var radius = 0.8;
+
+    for (var i = 0; i <= maxPoints; i++, t += deltaT) {
+        //calculate coordinate points
+        var x = radius *  Math.cos(t);
+        var y = 0.5 - t / tn;
+        var z = radius * Math.sin(t);
+
+        //set coordinate points
+        verticies[i * dimensions] = x;
+        verticies[i * dimensions + 1] = y;
+        verticies[i * dimensions + 2] = z;
+
+        //set indicies
+        indicies[i] = i;
+    }
+}
+
 //});
