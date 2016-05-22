@@ -26,8 +26,7 @@ function run() {
     createAndBindVertexBuffer();
     createAndBindIndexBuffer();
     setColor();
-    
-    gl.drawElements(gl.LINE_STRIP, ibo.numberOfElements, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(gl.LINES, ibo.numberOfElements, gl.UNSIGNED_SHORT, 0);
 }
 
 /**
@@ -246,34 +245,49 @@ function getIBOData() {
 
 function setVertexData() {
 
-    var pointsForOneGeometry = 32;
-    var loops = 5;
-    var maxPoints = pointsForOneGeometry * loops;
+    var lines = 32;
+    var rings = 5;
+    var maxPoints = (lines) * (rings);
     var dimensions = 3;
     var fullCircle = 2 * Math.PI;
 
     verticies = new Float32Array(maxPoints * dimensions);
-    indicies = new Uint16Array(maxPoints);
+    indicies = new Uint16Array(2 * 2 * maxPoints); //2 lines with 2 endpoints per line
 
-    var tn = loops * fullCircle;
-    var deltaT = fullCircle / pointsForOneGeometry;
-    var t = 0;
-    var radius = 0.8;
+    var dR = 1 / rings;
+    var dT = fullCircle / lines;
+    var iIndex = 0;
 
-    for (var i = 0; i <= maxPoints; i++, t += deltaT) {
-        //calculate coordinate points
-        var x = radius *  Math.cos(t);
-        var y = 0.5 - t / tn;
-        var z = radius * Math.sin(t);
+    //loop rings
+    for (var i = 0, r = 0; i <= rings; i++, r += dR) {
+        
+        //loop lines
+        for (var j = 0, t = 0; j <= lines; j++, t += dT) {
 
-        //set coordinate points
-        verticies[i * dimensions] = x;
-        verticies[i * dimensions + 1] = y;
-        verticies[i * dimensions + 2] = z;
+            var iVertex = i * ( lines * dimensions ) + (j * dimensions);
 
-        //set indicies
-        indicies[i] = i;
+            //calculate coordinate points
+            var x = r * Math.cos(t);
+            var y = r * Math.sin(t);
+            var z = 0;
+
+            //set coordinate points
+            verticies[iVertex] = x;
+            verticies[iVertex + 1] = y;
+            verticies[iVertex + 2] = z;
+
+            //set indicies
+            if (i > 0 && j > 0) {
+
+                indicies[iIndex++] = iVertex;
+                indicies[iIndex++] = iVertex - (lines * dimensions);
+
+                indicies[iIndex++] = iVertex;
+                indicies[iIndex++] = iVertex -  dimensions;
+            }
+        }
     }
+ 
 }
 
 //});
