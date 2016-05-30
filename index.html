@@ -5,9 +5,16 @@
     <title></title>
 	<meta charset="utf-8" />
     <script src="src/scripts/loadWebGl.js" type="text/javascript"></script>
+    <script src="src/scripts/lib/Vec3.js" type="text/javascript"></script>
+    <script src="src/scripts/lib/VecMath.js" type="text/javascript"></script>
+    <script src="src/scripts/lib/Geometry.js" type="text/javascript"></script>
 </head>
 <body onload="load()">
+	<button id="showWireframe">Show Wirefrime</button>
+	<button id="showFaces">Show Faces</button>
+    <button id="morphToSphere">Morph To Sphere</button>
     <canvas id="canvas" width="500" height="500"></canvas>
+    
     
     <!-- <script src="src/scripts/config.js"></script> -->
     <!-- <script data-main="main" src="src/scripts/requirejs.js"></script> -->
