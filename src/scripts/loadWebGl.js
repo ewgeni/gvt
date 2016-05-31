@@ -9,14 +9,20 @@ function load() {
     var canvas = document.getElementById('canvas');
     try {
         gl = canvas.getContext('webgl');
-        init();
+        init(canvas);
     } catch (e) {
         console.log(e);
         console.log('Es ist ein Fehler aufgetreten.');
     }
 }
 
-function init() {
+function init(canvas) {
+    gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
+
+    //prog.perspectiveMatrix = new J3DIMatrix4();
+    //prog.perspectiveMatrix.lookat(0, 0, 7, 0, 0, 0, 0, 1, 0);
+    //prog.perspectiveMatrix.perspective(30, canvas.clientWidth / canvas.clientHeight, 1, 10000);
+    
     bindEvents();
     setOptions();
     createShadersAndLinkProgram();
@@ -31,6 +37,7 @@ function init() {
 
 function run() {
     
+    clearScreen();
 
     //create and bind buffer
     for (var key in geometryBuffer) {
@@ -44,28 +51,26 @@ function run() {
     }
 }
 
+/**
+**/
 function bindEvents() {
 
-    document.getElementById("showWireframe")
-            .addEventListener("click", function () {
-                var geo = geometryBuffer[1];
-                clearScreen();
-                createAndBindIndexBuffer(geo.indicies);
-                drawElements(geo.primitive);
-            });
+    //document.getElementById("showWireframe")
+    //        .addEventListener("click", function () {
+    //            var geo = geometryBuffer[1];
+    //            clearScreen();
+    //            createAndBindIndexBuffer(geo.indicies);
+    //            drawElements(geo.primitive);
+    //        });
 
-    document.getElementById("showFaces")
-            .addEventListener("click", function() {
-                run();
-            });
+    //document.getElementById("showFaces")
+    //        .addEventListener("click", function() {
+    //            run();
+    //        });
 
     document.getElementById("morphToSphere")
            .addEventListener("click", function () {
-               clearScreen();
-               morphToSphere(geometryBuffer[4]);
-               console.log(geometryBuffer[4]);
-               run();
-               //drawElements(geometryBuffer.seedGeometry.primitive);
+                morphToSphere(geometryBuffer[4], 6);
            });
 }
 
@@ -206,30 +211,21 @@ function getSeedGeometryData(drawMode) {
     var mode = drawMode || gl.TRIANGLES;
     var seedGeoData = [];
     vertexDataPool.push(new Float32Array([
-                                0, 0.5, 0,
-                               -0.5, 0, 0,
-                                0.2, 0, 0,
-                               -0.1, 0.1, -0.5,
-                                0.5, 0.1, 0.05,
-                                0, -0.5, 0
+                               0, 0, 1,
+                               0, 0, -1,
+                               -1, 0, 0,
+                               0, -1, 0,
+                               1, 0, 0,
+                               0, 1, 0
+
     ]));
 
-    //var geo = new Geometry();
-    //geo.setColor({r:1, g:1, b:1, a:1});
-    //geo.setVerticies(vertexDataPool[0]);
-    //geo.setIndicies(new Uint16Array([0, 1, 1, 2, 2, 0, 2, 4, 4, 0,
-    //                                         4, 3, 0, 3, 3, 1, 1, 5, 5, 2,
-    //                                         5, 4, 5, 3
-    //]));
-
-   // seedGeoData.push(geo);
 
     switch (mode) {
         case gl.TRIANGLES:
                 geo2 = new Geometry(gl.TRIANGLES);
                 geo2.setVerticies(vertexDataPool[0]);
-                geo2.indicies = new Uint16Array([0, 1, 2, 0, 3, 1, 0, 4, 3, 0, 2, 4, 1, 5, 2, 3, 1, 5, 4, 3, 5, 2, 5, 4]);
-
+                geo2.indicies = new Uint16Array([5,4,0, 4,3,0, 3,2,0, 2,5,0, 5,1,4, 4,1,3, 3,1,2, 2,1,5 ]);
                 seedGeoData.push(geo2);
                 seedGeoData.reverse();
             break;
@@ -240,61 +236,90 @@ function getSeedGeometryData(drawMode) {
 
 /**
 **/
-function morphToSphere(geometryBufferData) {
+function morphToSphere(geometryBufferData, loops) {
 
     var dimensionOffset = 3;
     var vecMath = new VecMath();
 
     var oldVerticiesCount = geometryBufferData.verticies.length;
-    var oldIndiciesCount = geometryBufferData.indicies.length;
-
-    var newVerticiesCount = oldVerticiesCount * 3;
-    var newIndiciesCount = oldIndiciesCount * 4;
-
+    var newVerticiesCount = oldVerticiesCount * 9;
     var newVerticies = new Float32Array(newVerticiesCount);
-    var newIndicies = new Uint16Array(newIndiciesCount);
 
     newVerticies.set(geometryBufferData.verticies, 0);
 
-    var i = 0;
+    var oldIndiciesCount = geometryBufferData.indicies.length;
+    var newIndiciesCount = oldIndiciesCount * 4;
+    var newIndicies = new Uint16Array(newIndiciesCount);
+
     var trianglePoints = [];
+    var oldIndiciePoints = [];
+    var newVertexPointsForIndexBuffer = [];
+    var z = 0;
+
     for (let value of geometryBufferData.indicies) {
 
+        oldIndiciePoints.push(value);
         trianglePoints.push( geometryBufferData.getVertexPointsAsVec3ByIndex(value) );
 
         if (trianglePoints.length == 3) {
-            //console.log('trianglePoints');
-            //console.log(trianglePoints);
-
             var centerPoints = vecMath.calcCenterPointsOfTriangles(trianglePoints);
 
-            //console.log('centerPoints');
-            //console.log(centerPoints);
             //add new vertex points
-            for (var j = 0; j < centerPoints.length; j++) {
+            for (var j = 0; j < centerPoints.length; j++, oldVerticiesCount+=3) {
 
-                var newVertexOffset = oldVerticiesCount + (i * dimensionOffset) + (j * dimensionOffset);
-                var newIndiciesIndex = oldIndiciesCount + j;
                 var point = centerPoints[j];
+                point.normalize();
 
-                newVerticies[newVertexOffset] = point.x;
-                newVerticies[newVertexOffset + 1] = point.y;
-                newVerticies[newVertexOffset + 2] = point.z;
-
-                //console.log(point);
-                //console.log(newVerticies);
+                newVerticies[oldVerticiesCount] = point.x;
+                newVerticies[oldVerticiesCount + 1] = point.y;
+                newVerticies[oldVerticiesCount + 2] = point.z;
                 
+                newVertexPointsForIndexBuffer.push( oldVerticiesCount / 3 );
 
-                newIndicies[newIndiciesIndex] = newVertexOffset / dimensionOffset;
             }
 
-            i++;
-            triangleMod = 0;
-            trianglePoints = [];
+            newIndicies[z] = oldIndiciePoints[0];
+            newIndicies[z + 1] = newVertexPointsForIndexBuffer[0];
+            newIndicies[z + 2] = newVertexPointsForIndexBuffer[2];
+
+            z += 3;
+
+            newIndicies[z] = oldIndiciePoints[1];
+            newIndicies[z + 1] = newVertexPointsForIndexBuffer[1];
+            newIndicies[z + 2] = newVertexPointsForIndexBuffer[0];
+
+
+            z += 3;
+
+            newIndicies[z] = oldIndiciePoints[2];
+            newIndicies[z + 1] = newVertexPointsForIndexBuffer[2];
+            newIndicies[z + 2] = newVertexPointsForIndexBuffer[1];
+
+
+            z += 3;
+
+            newIndicies[z] = newVertexPointsForIndexBuffer[2];
+            newIndicies[z + 1] = newVertexPointsForIndexBuffer[1];
+            newIndicies[z + 2] = newVertexPointsForIndexBuffer[0];
+
+            z += 3;
+
+            trianglePoints = []; // flush old points
+            oldIndiciePoints = [];
+            newVertexPointsForIndexBuffer = [];
         }
     }
 
     geometryBuffer[4].setVerticies(newVerticies);
     geometryBuffer[4].setIndicies(newIndicies);
+
+    run();
+
+    //prog.perspectiveMatrix.lookat(0, 0, 7, 0, 0, 0, 0, 1, 0);
+
+    if (loops > 0) {        
+        morphToSphere(geometryBuffer[4], loops - 1);
+    }
 }
+
 //});
