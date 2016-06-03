@@ -135,13 +135,25 @@ var app = ( function() {
 		createModel("ground", wireframe);
 	}
 
+    /**
+    **/
+	function calculateCameraOrbit() {
+	    var x = 0,
+            z = 2;
+
+	    camera.eye[x] = camera.center[x];
+	    camera.eye[z] = camera.center[z];
+	    camera.eye[x] += camera.distance * Math.sin(camera.zAngle);
+	    camera.eye[z] += camera.distance * Math.cos(camera.zAngle);
+	}
+
 	/**
 	 * Create model object, fill it and push it in models array.
 	 * 
 	 * @parameter geometryname: string with name of geometry.
 	 * @parameter fillstyle: wireframe, fill, fillwireframe.
 	 */
- function createModel(geometryname, fillstyle) {
+    function createModel(geometryname, fillstyle) {
 		var model = {};
 		model.fillstyle = fillstyle;
 		initDataAndBuffers(model, geometryname);
@@ -199,9 +211,12 @@ var app = ( function() {
 
 	function initEventHandler() {
 
-		window.onkeydown = function(evt) {
+	    window.onkeydown = function (evt) {
+	        var sign = evt.shiftKey ? -1 : 1;
 			var key = evt.which ? evt.which : evt.keyCode;
 			var c = String.fromCharCode(key);
+
+			var deltaRotate = Math.PI / 36;
 			// console.log(evt);
 
 			// Change projection of scene.
@@ -210,6 +225,11 @@ var app = ( function() {
 					camera.projectionType = "ortho";
 					camera.lrtb = 2;
 					break;
+
+			    case ('C'):
+			        //Orbit camera
+			        camera.zAngle += sign * deltaRotate;
+			        break;
 			}
 
 			// Render the scene again on any key pressed.
@@ -226,8 +246,11 @@ var app = ( function() {
 
 		setProjection();
 
-		mat4.identity(camera.vMatrix);
-		mat4.rotate(camera.vMatrix, camera.vMatrix, Math.PI / 2, [1, 0, 0]);
+		//mat4.identity(camera.vMatrix);
+	    //mat4.rotate(camera.vMatrix, camera.vMatrix, Math.PI / 2, [1, 0, 0]);
+
+		calculateCameraOrbit();
+		mat4.lookAt(camera.vMatrix, camera.eye, camera.center, camera.up);
 
 		// Loop over models.
 		for(var i = 0; i < models.length; i++) {
