@@ -229,25 +229,25 @@ var app = ( function() {
 			// Change projection of scene.
 			switch(c) {
 				case('O'):
-				        camera.projectionType = camera.PROJECTION_ORTHO;
-					    camera.lrtb = 2;
+				    camera.projectionType = camera.PROJECTION_ORTHO;
+					camera.lrtb = 2;
 					break;
 
 			    case ('C'):
-			            //Orbit camera
-			            camera.zAngle += sign * deltaRotate;
+			        //Orbit camera
+			        camera.zAngle += sign * deltaRotate;
 			        break;
 
 
 			    case ('F'):
-			            //change projection mode to frustum
-			            camera.projectionType = camera.PROJECTION_FRUSTUM;
+			        //change projection mode to frustum
+			        camera.projectionType = camera.PROJECTION_FRUSTUM;
 			        break;
 
 			    case ('P'):
-			            //change projection mode to perspective
-			            camera.projectionType = camera.PROJECTION_PERSPECTIVE;
-			            break;
+			        //change projection mode to perspective
+			        camera.projectionType = camera.PROJECTION_PERSPECTIVE;
+			        break;
 
 			    case ('D'):
 			        //change projection mode to perspective
@@ -261,6 +261,26 @@ var app = ( function() {
 			        var z = camera.eye[2];
 
 			        camera.eye = [x , y, z];
+			        break;
+
+			    case ('V'):
+
+			        switch (camera.projectionType) {
+
+			            case (camera.PROJECTION_FRUSTUM):
+			                camera.lrtb += sign * 0.1;
+			                break;
+                        
+			            case (camera.PROJECTION_PERSPECTIVE):
+			                camera.fovy += sign * 5 * Math.PI / 180
+			                break;
+			        }
+
+			        break;
+
+			   case ('D'):
+			        //change projection mode to perspective
+			        camera.distance += sign * 0.2;
 			        break;
 			}
 
