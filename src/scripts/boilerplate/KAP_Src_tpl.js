@@ -9,7 +9,13 @@ var app = ( function() {
 	// Array of model objects.
 	var models = [];
 
-	var camera = {
+    var camera = {
+
+	    //const projection types
+	    PROJECTION_ORTHO : 1,
+	    PROJECTION_FRUSTUM : 2,
+	    PROJECTION_PERSPECTIVE : 3,
+
 		// Initial position of the camera.
 		eye : [0, 1, 4],
 		// Point to look at.
@@ -27,7 +33,7 @@ var app = ( function() {
 		// Projection matrix.
 		pMatrix : mat4.create(),
 		// Projection types: ortho, perspective, frustum.
-		projectionType : "ortho",
+		projectionType: 1,
 		// Angle to Z-Axis for camera when orbiting the center
 		// given in radian.
 		zAngle : 0,
@@ -212,6 +218,7 @@ var app = ( function() {
 	function initEventHandler() {
 
 	    window.onkeydown = function (evt) {
+
 	        var sign = evt.shiftKey ? -1 : 1;
 			var key = evt.which ? evt.which : evt.keyCode;
 			var c = String.fromCharCode(key);
@@ -222,13 +229,25 @@ var app = ( function() {
 			// Change projection of scene.
 			switch(c) {
 				case('O'):
-					camera.projectionType = "ortho";
-					camera.lrtb = 2;
+					    camera.projectionType = "ortho";
+					    camera.lrtb = 2;
 					break;
 
 			    case ('C'):
-			        //Orbit camera
-			        camera.zAngle += sign * deltaRotate;
+			            //Orbit camera
+			            console.log(sign);
+			            camera.zAngle += sign * deltaRotate;
+			        break;
+
+
+			    case ('F'):
+			            //change projection mode to frustum
+			            camera.projectionType = camera.PROJECTION_FRUSTUM;
+			        break;
+
+			    case ('P'):
+			            //change projection mode to perspective
+			            camera.projectionType = camera.PROJECTION_PERSPECTIVE;
 			        break;
 			}
 
@@ -266,12 +285,23 @@ var app = ( function() {
 	}
 
 	function setProjection() {
-		// Set projection Matrix.
-		switch(camera.projectionType) {
-			case("ortho"):
+	    // Set projection Matrix.
+
+	    switch (camera.projectionType) {
+
+			case(camera.PROJECTION_ORTHO):
 				var v = camera.lrtb;
 				mat4.ortho(camera.pMatrix, -v, v, -v, v, -10, 10);
 				break;
+
+	        case (camera.PROJECTION_FRUSTUM):
+	            var v = camera.lrtb;
+	            mat4.frustum(camera.pMatrix, -v / 2, v / 2, -v / 2, v / 2, 1, 10);
+		        break;
+
+	        case (camera.PROJECTION_PERSPECTIVE):
+	            mat4.perspective(camera.pMatrix, camera.fovy, camera.aspect, 1, 10);
+		        break;
 		}
 		// Set projection uniform.
 		gl.uniformMatrix4fv(prog.pMatrixUniform, false, camera.pMatrix);
