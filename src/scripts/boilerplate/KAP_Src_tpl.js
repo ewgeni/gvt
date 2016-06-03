@@ -224,6 +224,7 @@ var app = ( function() {
 		setProjection();
 
 		mat4.identity(camera.vMatrix);
+		mat4.rotate(camera.vMatrix, camera.vMatrix, Math.PI / 4, [1, 0, 0]);
 
 		// Loop over models.
 		for(var i = 0; i < models.length; i++) {
