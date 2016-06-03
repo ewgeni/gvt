@@ -128,8 +128,11 @@ var app = ( function() {
 
 	function initModels() {
 		// fill-style
-		var fs = "fillwireframe";
+	    var fs = "fillwireframe";
+	    var wireframe = "wireframe";
+
 		createModel("torus", fs);
+		createModel("ground", wireframe);
 	}
 
 	/**
@@ -224,7 +227,7 @@ var app = ( function() {
 		setProjection();
 
 		mat4.identity(camera.vMatrix);
-		mat4.rotate(camera.vMatrix, camera.vMatrix, Math.PI / 4, [1, 0, 0]);
+		mat4.rotate(camera.vMatrix, camera.vMatrix, Math.PI / 2, [1, 0, 0]);
 
 		// Loop over models.
 		for(var i = 0; i < models.length; i++) {
