@@ -33,7 +33,7 @@ var app = ( function() {
 		// Projection matrix.
 		pMatrix : mat4.create(),
 		// Projection types: ortho, perspective, frustum.
-		projectionType: 1,
+		projectionType: 3,
 		// Angle to Z-Axis for camera when orbiting the center
 		// given in radian.
 		zAngle : 0,
@@ -219,7 +219,7 @@ var app = ( function() {
 
 	    window.onkeydown = function (evt) {
 
-	        var sign = evt.shiftKey ? -1 : 1;
+	        var sign = evt.shiftKey ? 1 : -1;
 			var key = evt.which ? evt.which : evt.keyCode;
 			var c = String.fromCharCode(key);
 
@@ -229,13 +229,12 @@ var app = ( function() {
 			// Change projection of scene.
 			switch(c) {
 				case('O'):
-					    camera.projectionType = "ortho";
+				        camera.projectionType = camera.PROJECTION_ORTHO;
 					    camera.lrtb = 2;
 					break;
 
 			    case ('C'):
 			            //Orbit camera
-			            console.log(sign);
 			            camera.zAngle += sign * deltaRotate;
 			        break;
 
@@ -248,6 +247,20 @@ var app = ( function() {
 			    case ('P'):
 			            //change projection mode to perspective
 			            camera.projectionType = camera.PROJECTION_PERSPECTIVE;
+			            break;
+
+			    case ('D'):
+			        //change projection mode to perspective
+			        camera.distance += sign * 0.2;
+			        break;
+
+			    case ('H'):
+			        //change projection mode to perspective
+			        var x = camera.eye[0];
+			        var y = camera.eye[1] + sign * 0.2;
+			        var z = camera.eye[2];
+
+			        camera.eye = [x , y, z];
 			        break;
 			}
 
