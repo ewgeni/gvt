@@ -146,7 +146,7 @@ var app = ( function() {
 		
 	
 		// Select one model that can be manipulated interactively by user.
-		interactiveModel = models[0];
+	    interactiveModel = models[1];
 	}
 
 	/**
@@ -156,7 +156,8 @@ var app = ( function() {
 	 * @parameter fillstyle: wireframe, fill, fillwireframe.
 	 */
 	function createModel(geometryname, fillstyle, translate, rotate, scale) {
-		var model = {};
+	    var model = {};
+	    model.identity = new Date().getMilliseconds();
 		model.fillstyle = fillstyle;
 		initDataAndBuffers(model, geometryname);
 		initTransformations(model, translate, rotate, scale);
@@ -252,6 +253,7 @@ var app = ( function() {
 					camera.projectionType = "perspective";
 					break;
 			}
+
 			// Camera move and orbit.
 			switch(c) {
 				case('C'):
@@ -274,7 +276,21 @@ var app = ( function() {
 					// Camera near plane dimensions.
 					camera.lrtb += sign * 0.1;
 					break;
+			    case('X'):
+			        // rotate torus around x axis
+			        interactiveModel.rotate[0] += sign * deltaRotate;
+			        break;
+			    case ('Y'):
+			        // rotate torus around y axis
+			        interactiveModel.rotate[1] += sign * deltaRotate;
+			        break;
+			    case ('Z'):
+			        // rotate torus around z axis
+			        interactiveModel.rotate[2] += sign * deltaRotate;
+			        break;
 			}
+
+
 			// Render the scene again on any key pressed.
 			render();
 		};
@@ -344,7 +360,15 @@ var app = ( function() {
 	    mat4.identity(model.mMatrix);
 	    mat4.identity(model.mvMatrix);
 
+
 	    mat4.translate(model.mMatrix, model.mMatrix, model.translate);
+
+	    if (model.identity == interactiveModel.identity) {
+	        mat4.rotateX(model.mMatrix, model.mMatrix, interactiveModel.rotate[0]);
+	        mat4.rotateY(model.mMatrix, model.mMatrix, interactiveModel.rotate[1]);
+	        mat4.rotateZ(model.mMatrix, model.mMatrix, interactiveModel.rotate[2]);
+	    }
+
 	    mat4.scale(model.mMatrix, model.mMatrix, model.scale);
 
 	    mat4.multiply(model.mvMatrix, camera.vMatrix, model.mMatrix);
