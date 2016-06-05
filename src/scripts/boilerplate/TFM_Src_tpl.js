@@ -127,6 +127,9 @@ var app = ( function() {
 
 		// Model-View-Matrix.
 		prog.mvMatrixUniform = gl.getUniformLocation(prog, "uMVMatrix");
+
+	    //Model Color.
+		prog.colorUniform = gl.getUniformLocation(prog, "uColor");
 	}
 
 	function initModels() {
@@ -135,14 +138,14 @@ var app = ( function() {
 	    var fsFill = 'fill';
 	    var fsWireframe = 'wireframe';
 
-	    createModel("ground", fsWireframe, [0, 0, 0], [0, 0, 0], [1, 1, 1]);
-	    createModel("torus", fsFillWireframe, [0, 0.8, 0], [0, 0, 0], [1, 1, 1]);
+	    createModel("ground", fsWireframe, [0, 0, 0, 1], [0, 0, 0], [0, 0, 0], [1, 1, 1]);
+	    createModel("torus", fsFill, [1, 1, 1, 1], [0, 0.8, 0], [0, 0, 0], [1, 1, 1]);
 
         //place 4 spheres
-	    createModel("sphere", fsFillWireframe, [1, 0.5, 1], [0, 0, 0], [0.5, 0.5, 0.5]);
-	    createModel("sphere", fsFillWireframe, [-1, 0.5, 1], [0, 0, 0], [0.5, 0.5, 0.5]);
-	    createModel("sphere", fsFillWireframe, [1, 0.5, -1], [0, 0, 0], [0.5, 0.5, 0.5]);
-	    createModel("sphere", fsFillWireframe, [-1, 0.5, -1], [0, 0, 0], [0.5, 0.5, 0.5]);
+	    createModel("sphere", fsFill, [1, 0, 0, 1], [1, 0.5, 1], [0, 0, 0], [0.5, 0.5, 0.5]);
+	    createModel("sphere", fsFill, [0, 1, 0, 1], [-1, 0.5, 1], [0, 0, 0], [0.5, 0.5, 0.5]);
+	    createModel("sphere", fsFill, [0, 0, 1, 1], [1, 0.5, -1], [0, 0, 0], [0.5, 0.5, 0.5]);
+	    createModel("sphere", fsFill, [1, 1, 0, 1], [-1, 0.5, -1], [0, 0, 0], [0.5, 0.5, 0.5]);
 		
 	
 		// Select one model that can be manipulated interactively by user.
@@ -155,9 +158,10 @@ var app = ( function() {
 	 * @parameter geometryname: string with name of geometry.
 	 * @parameter fillstyle: wireframe, fill, fillwireframe.
 	 */
-	function createModel(geometryname, fillstyle, translate, rotate, scale) {
+	function createModel(geometryname, fillstyle,color, translate, rotate, scale) {
 	    var model = {};
 	    model.identity = new Date().getMilliseconds();
+	    model.color = color;
 		model.fillstyle = fillstyle;
 		initDataAndBuffers(model, geometryname);
 		initTransformations(model, translate, rotate, scale);
@@ -318,6 +322,8 @@ var app = ( function() {
 			// Set uniforms for model.
 			gl.uniformMatrix4fv(prog.mvMatrixUniform, false, 
 				models[i].mvMatrix);
+
+			gl.uniform4fv(prog.colorUniform, models[i].color);
 			
 			draw(models[i]);
 		}
