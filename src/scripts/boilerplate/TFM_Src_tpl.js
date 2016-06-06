@@ -130,6 +130,9 @@ var app = ( function() {
 
 	    //Model Color.
 		prog.colorUniform = gl.getUniformLocation(prog, "uColor");
+
+	    //Normal transformation Matrix.
+		prog.nMatrixUniform = gl.getUniformLocation(prog, "uNMatrix");
 	}
 
 	function initModels() {
@@ -183,6 +186,9 @@ var app = ( function() {
 
 		// Create and initialize Model-View-Matrix.
 		model.mvMatrix = mat4.create();
+
+	    // Create and initialize Normal-Matrix
+		model.nMatrix = mat3.create();
 	}
 
 	/**
@@ -324,6 +330,7 @@ var app = ( function() {
 				models[i].mvMatrix);
 
 			gl.uniform4fv(prog.colorUniform, models[i].color);
+			gl.uniformMatrix3fv(prog.nMatrixUniform, false, models[i].nMatrix);
 			
 			draw(models[i]);
 		}
@@ -378,6 +385,8 @@ var app = ( function() {
 	    mat4.scale(model.mMatrix, model.mMatrix, model.scale);
 
 	    mat4.multiply(model.mvMatrix, camera.vMatrix, model.mMatrix);
+
+	    mat3.normalFromMat4(model.nMatrix, model.mvMatrix);
 	}
 
 	function draw(model) {
