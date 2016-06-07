@@ -11,6 +11,18 @@ var app = ( function() {
 
 	// Model that is target for user input.
 	var interactiveModel;
+	var interactiveSpheres = {};
+	interactiveSpheres.identity = 42;
+	interactiveSpheres.in = function (id) {
+
+	    for (var i = 0; i < interactiveSpheres.geo.length; i++) {
+	        if (id == interactiveSpheres.geo[i].identity) {
+	            return true;
+	        }
+	    }
+
+	    return false;
+	}
 
 	var camera = {
 		// Initial position of the camera.
@@ -142,17 +154,27 @@ var app = ( function() {
 	    var fsWireframe = 'wireframe';
 
 	    createModel("ground", fsWireframe, [0, 0, 0, 1], [0, 0, 0], [0, 0, 0], [1, 1, 1]);
-	    createModel("torus", fsFill, [1, 1, 1, 1], [0, 0.8, 0], [0, 0, 0], [1, 1, 1]);
+	    createModel("torus", fsFill, [1, 1, 1, 1], [1, 0.5, 0], [0, 0, 0], [0.5, 0.5, 0.5]);
 
         //place 4 spheres
-	    createModel("sphere", fsFill, [1, 0, 0, 1], [1, 0.5, 1], [0, 0, 0], [0.5, 0.5, 0.5]);
-	    createModel("sphere", fsFill, [0, 1, 0, 1], [-1, 0.5, 1], [0, 0, 0], [0.5, 0.5, 0.5]);
-	    createModel("sphere", fsFill, [0, 0, 1, 1], [1, 0.5, -1], [0, 0, 0], [0.5, 0.5, 0.5]);
-	    createModel("sphere", fsFill, [1, 1, 0, 1], [-1, 0.5, -1], [0, 0, 0], [0.5, 0.5, 0.5]);
+	    createModel("sphere", fsFill, [1, 0, 0, 1], [1, 0.5, 0], [0, 0, 0], [0.1, 0.1, 0.1]);
+	    createModel("sphere", fsFill, [0, 1, 0, 1], [-1, 0.5, 0], [0, 0, 0], [0.1, 0.1, 0.1]);
+	    createModel("sphere", fsFill, [0, 0, 1, 1], [0, 0.5, 1], [0, 0, 0], [0.1, 0.1, 0.1]);
+	    createModel("sphere", fsFill, [1, 1, 0, 1], [0, 0.5, -1], [0, 0, 0], [0.1, 0.1, 0.1]);
+
+	    createModel("torus", fsFill, [0, 0, 0, 1], [-1, 0.5, 0], [0, 0, 0], [0.5, 0.5, 0.5]);
 		
 	
 		// Select one model that can be manipulated interactively by user.
 	    interactiveModel = models[1];
+	    interactiveModel.cutPointTranslate = [0,0,0];
+
+	    interactiveSpheres.rotate = 0;
+	    interactiveSpheres.geo = new Array();
+	    interactiveSpheres.geo.push(models[2]);
+	    interactiveSpheres.geo.push(models[3]);
+	    interactiveSpheres.geo.push(models[4]);
+	    interactiveSpheres.geo.push(models[5]);
 	}
 
 	/**
@@ -163,9 +185,19 @@ var app = ( function() {
 	 */
 	function createModel(geometryname, fillstyle,color, translate, rotate, scale) {
 	    var model = {};
-	    model.identity = new Date().getMilliseconds();
+        
+	    model.identity = Math.random();
 	    model.color = color;
-		model.fillstyle = fillstyle;
+	    model.fillstyle = fillstyle;
+	    model.invertVec3 = function (vec3) {
+	        var invertedVec3 = [];
+	        for (var i = 0; i < vec3.length; i++) {
+	            invertedVec3[i] = vec3[i] * -1;
+	        }
+
+	        return invertedVec3;
+	    };
+
 		initDataAndBuffers(model, geometryname);
 		initTransformations(model, translate, rotate, scale);
 
@@ -239,8 +271,11 @@ var app = ( function() {
 
 	function initEventHandler() {
 		// Rotation step.
-		var deltaRotate = Math.PI / 36;
+	    var deltaRotate = Math.PI / 16;
+	    var deltaTorusRotate = Math.PI / 4;
 		var deltaTranslate = 0.05;
+		var cutPoint = Math.PI / 2;
+		var torusMoveDirection = 1;
 
 		window.onkeydown = function(evt) {
 			var key = evt.which ? evt.which : evt.keyCode;
@@ -297,6 +332,19 @@ var app = ( function() {
 			    case ('Z'):
 			        // rotate torus around z axis
 			        interactiveModel.rotate[2] += sign * deltaRotate;
+			        break;
+			    case ('K'):
+			        interactiveSpheres.rotate += sign * deltaRotate;
+			        interactiveModel.rotate[1] += sign * deltaTorusRotate;
+			        
+			        //if (cutPoint == interactiveModel.rotate) {
+			        //    torusMoveDirection *= -1;
+			        //    interactiveSpheres.rotate = 0;
+			        //}
+
+			        //interactiveModel.cutPointTranslate[0] += torusMoveDirection * 2/9;
+			        //interactiveModel.cutPointTranslate[1] = 0;
+			        //interactiveModel.cutPointTranslate[2] = 0;
 			        break;
 			}
 
@@ -373,10 +421,20 @@ var app = ( function() {
 	    mat4.identity(model.mMatrix);
 	    mat4.identity(model.mvMatrix);
 
-
 	    mat4.translate(model.mMatrix, model.mMatrix, model.translate);
+	    
+	    if (interactiveSpheres.in(model.identity)) {
+	        var invertedTranslateVec3 = model.invertVec3(model.translate);
+	        
+	        mat4.translate(model.mMatrix, model.mMatrix, invertedTranslateVec3);
+	        mat4.rotateY(model.mMatrix, model.mMatrix, interactiveSpheres.rotate);
+	        mat4.translate(model.mMatrix, model.mMatrix, model.translate);
+	    }
 
 	    if (model.identity == interactiveModel.identity) {
+	        //console.log(interactiveModel.cutPointTranslate);
+	        mat4.translate(model.mMatrix, model.mMatrix, interactiveModel.cutPointTranslate);
+
 	        mat4.rotateX(model.mMatrix, model.mMatrix, interactiveModel.rotate[0]);
 	        mat4.rotateY(model.mMatrix, model.mMatrix, interactiveModel.rotate[1]);
 	        mat4.rotateZ(model.mMatrix, model.mMatrix, interactiveModel.rotate[2]);
