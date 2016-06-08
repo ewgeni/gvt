@@ -1,46 +1,47 @@
-﻿<!DOCTYPE html5>
+<!DOCTYPE html5>
 <html>
-<head>
-    <script src="src/scripts/lib/gl-matrix-min.js"></script>
-    <script src="src/scripts/boilerplate/GVT_Src_vertexData_torus.js"></script>
-    <script src="src/scripts/boilerplate/GVT_Src_vertexData_sphere.js"></script>
-    <script src="src/scripts/modules/geometry/ground.js"></script>
-    <script src="src/scripts/boilerplate/TFM_Src_tpl.js"></script>
+	<head>
+		<script src="src/scripts/lib/gl-matrix-min.js"></script>
+		<script src="src/scripts/boilerplate/GVT_Src_vertexData_plane.js"></script>
+		<script src="src/scripts/boilerplate/SHA_Src_tpl.js"></script>
+		<script type="x-shader/x-vertex" id="vertexshader">
+			precision mediump float;
+			
+			attribute vec3 aPosition;
+			attribute vec3 aNormal;
+			
+			uniform mat4 uPMatrix;
+			uniform mat4 uMVMatrix;
+			uniform mat3 uNMatrix;
+			uniform vec4 uColor;
+			
+			varying vec4 vColor;
 
-    <script type="x-shader/x-vertex" id="vertexshader">
-        attribute vec3 aPosition;
-        attribute vec3 aNormal;
+            float displacemet;
 
-        uniform mat4 uPMatrix;
-        uniform mat4 uMVMatrix;
-        uniform mat3 uNMatrix;
-        uniform vec4 uColor;
-
-        varying vec4 vColor;
-
-        vec3 tNormal;
-
-        void main(){
-
-            gl_Position = uPMatrix * uMVMatrix * vec4(aPosition, 1.0);
-
-            tNormal = uNMatrix * aNormal;
-            vColor = vec4(tNormal.z, tNormal.z, tNormal.z, 1.0);
-            vColor = uColor * (vColor + 1.0) / 2.0;
-        }
-    </script>
-
-    <script type="x-shader/x-fragment" id="fragmentshader">
-        precision mediump float;
-        varying vec4 vColor;
-
-        void main() {
-        gl_FragColor = vColor;
-        }
-    </script>
-
-</head>
-<body onload="app.start()">
-    <canvas id="canvas" width="500" height="500"></canvas>
-</body>
+            vec3 newPosition;
+			
+			void main(){
+                
+                displacemet = sin(aPosition.x) * sin(aPosition.z);
+                newPosition = aPosition + displacemet * vec3(0.0, 0.8, 0.3);
+				gl_Position = uPMatrix * uMVMatrix * vec4(newPosition, 1.0);
+				
+				vec3 tNormal = uNMatrix * aNormal;
+			
+				vColor = uColor;
+			}
+		</script>
+		<script type="x-shader/x-fragment" id="fragmentshader">
+			precision mediump float;
+			varying vec4 vColor;
+			
+			void main() {
+				gl_FragColor = vColor;
+			}
+		</script>
+	</head>
+	<body onload="app.start()">
+		<canvas id="canvas" width="500" height="500"></canvas>
+	</body>
 </html>
