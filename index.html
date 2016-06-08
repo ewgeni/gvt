@@ -19,22 +19,16 @@
             varying float displacement;
 
             vec3 newPosition;
-            vec4 newColor;
 			
 			void main(){
                 
-                displacement = cos(aPosition.x) * cos(aPosition.z);
-                newPosition = aPosition + displacement * vec3(0.0, 1.0, 0.0);
-				gl_Position = uPMatrix * uMVMatrix * vec4(newPosition, 1.0);
+                //displacement = cos(aPosition.x) * cos(aPosition.z);
+                //newPosition = aPosition + displacement * vec3(0.0, 1.0, 0.0);
+				gl_Position = uPMatrix * uMVMatrix * vec4(aPosition, 1.0);
 				
 				vec3 tNormal = uNMatrix * aNormal;
                 
-                newColor = uColor;
-                newColor.r -= displacement * displacement * displacement;
-                newColor.g -= displacement * displacement;
-                newColor.b += displacement * displacement * displacement;
-			
-				vColor = newColor;
+				vColor = uColor;
 			}
 		</script>
 		<script type="x-shader/x-fragment" id="fragmentshader">
@@ -44,8 +38,16 @@
 			varying vec4 vColor;
 			
 			void main() {
+                const float PI = 3.1415926535;
+                int l = int(PI);
+                float f = float(l);
+                 
                 vec4 newColor = vColor;
-
+                
+                if (f != 3.0) {
+                    discard;
+                }
+                
                 //newColor.r -= displacement * displacement * displacement;
                 //newColor.g -= displacement * displacement;
                 //newColor.b += displacement * displacement * displacement;
