@@ -17,14 +17,10 @@
 			uniform vec4 uColor;
 			
 			varying vec4 vColor;
-            varying float displacement;
 
             vec3 newPosition;
 			
 			void main(){
-                //displacement = cos(aPosition.x) * cos(aPosition.z);
-                //newPosition = aPosition + displacement * vec3(0.0, 1.0, 0.0);
-               
                 
 				gl_Position = uPMatrix * uMVMatrix * vec4(aPosition, 1.0);
 				
@@ -32,13 +28,9 @@
                 
 				vColor = uColor;
 
-                //float x = aPosition.x;
-                //float z = aPosition.z;
-                //float dist2 = x*x+z*z;
-                
-                //if (dist2 < 25.) {
-                    //vColor.gb = vec2(0.);
-                //}
+                vColor.r = mod(aPosition.x, 3.) /2.;
+                vColor.g = mod(aPosition.z, 5.) /2.;
+                vColor.b = mod(aPosition.x, 4.) /2.;
 			}
 		</script>
 		<script type="x-shader/x-fragment" id="fragmentshader">
@@ -48,30 +40,9 @@
 			varying vec4 vColor;
 			
 			void main() {
-                //const float PI = 3.1415926535;
-                //int l = int(PI);
-                //float f = float(l);
-                 
-                vec4 newColor = vColor;
-                
-                //if (f != 3.0) {
-                    //discard;
-                //}
-                
-                //newColor.r -= displacement * displacement * displacement;
-                //newColor.g -= displacement * displacement;
-                //newColor.b += displacement * displacement * displacement;
-                ;
-                float x = gl_FragCoord.x - 250.;
-                float y = gl_FragCoord.y - 250.;
+              
 
-                float dist2 = x * x + y * y;
-                
-                if (dist2 < 2500.) {
-                    newColor.gb = vec2(0.);
-                }
-
-				gl_FragColor = newColor;
+				gl_FragColor = vColor;
 			}
 		</script>
 	</head>
