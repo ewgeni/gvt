@@ -139,8 +139,12 @@ var app = ( function() {
 		var fs = "fillwireframe";
 		createModel("plane", fs, [1, 1, 1, 1], [0, 0, 0], [0, 0, 0], [1, 1, 1]);
 
+		createModel("sphere", fs, [1, 0, 0, 1], [0, 0.5, 2], [0, 0, 0], [0.5, 0.5, 0.5]);
+		createModel("sphere", fs, [0, 1, 0, 1], [-0.5, 0.5, 1.75], [0, 0, 0], [0.5, 0.5, 0.5]);
+		createModel("sphere", fs, [0, 0, 1, 1], [0.5, 0.5, 1.75], [0, 0, 0], [0.5, 0.5, 0.5]);
+
 		// Select one model that can be manipulated interactively by user.
-		interactiveModel = models[0];
+		//interactiveModel = models[0];
 	}
 
 	/**
