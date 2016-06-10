@@ -27,22 +27,46 @@
 				vec3 tNormal = uNMatrix * aNormal;
                 
 				vColor = uColor;
-
-                vColor.r = mod(aPosition.x, 3.) /2.;
-                vColor.g = mod(aPosition.z, 5.) /2.;
-                vColor.b = mod(aPosition.x, 4.) /2.;
 			}
 		</script>
 		<script type="x-shader/x-fragment" id="fragmentshader">
 			precision mediump float;
-            
-            varying float displacement; 
+             
 			varying vec4 vColor;
-			
-			void main() {
-              
+			int x, y;
+            int max, min;
 
-				gl_FragColor = vColor;
+			void main() {
+                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+
+                const int fibunacciLoops = 500; //canvas size
+              
+                int x = int(gl_FragCoord.x);
+                int y = int(gl_FragCoord.y);
+
+                //??
+                max = x > y ? x : y;
+                min = x < y ? x : y;
+
+                //fibonacci numbers
+                int fiboCurr = 1;
+                int fiboNext = fiboCurr + 1;
+                int fiboNew;
+                
+                for (int i = 0; i < fibunacciLoops; i++ ) {
+                    
+                    if (fiboCurr > max) {
+                        break;
+                    }
+
+                    fiboNew = fiboCurr + fiboNext;
+                    fiboCurr = fiboNext;
+                    fiboNext = fiboNew;
+             
+                    if (fiboCurr == x || fiboCurr == y) {
+                        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+                    }
+                }
 			}
 		</script>
 	</head>
