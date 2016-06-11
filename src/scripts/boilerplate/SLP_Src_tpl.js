@@ -14,7 +14,7 @@ var app = ( function() {
 
 	var camera = {
 		// Initial position of the camera.
-		eye : [0, 1, 4],
+		eye : [0, 2, 4],
 		// Point to look at.
 		center : [0, 0, 0],
 		// Roll and pitch of the camera.
@@ -132,6 +132,10 @@ var app = ( function() {
 
 		// Color.
 		prog.colorUniform = gl.getUniformLocation(prog, "uColor");
+
+	    // Z-Buffer.
+		prog.zBufferVisualizationMode = gl.getUniformLocation(prog, "uZBufferVisualizationMode");
+		prog.zBufferVisualizationMode = 2;
 	}
 
 	function initModels() {
@@ -139,12 +143,14 @@ var app = ( function() {
 		var fs = "fillwireframe";
 		createModel("plane", fs, [1, 1, 1, 1], [0, 0, 0], [0, 0, 0], [1, 1, 1]);
 
-		createModel("sphere", fs, [1, 0, 0, 1], [0, 0.5, 2], [0, 0, 0], [0.5, 0.5, 0.5]);
-		createModel("sphere", fs, [0, 1, 0, 1], [-0.5, 0.5, 1.75], [0, 0, 0], [0.5, 0.5, 0.5]);
-		createModel("sphere", fs, [0, 0, 1, 1], [0.5, 0.5, 1.75], [0, 0, 0], [0.5, 0.5, 0.5]);
+		createModel("sphere", fs, [1, 0, 0, 1], [0, 0.5, 0], [0, 0, 0], [0.5, 0.5, 0.5]);
+		createModel("sphere", fs, [0, 1, 0, 1], [-0.5, 0.5, -0.25], [0, 0, 0], [0.5, 0.5, 0.5]);
+		createModel("sphere", fs, [0, 0, 1, 1], [0.5, 0.5, -0.25], [0, 0, 0], [0.5, 0.5, 0.5]);
 
 		// Select one model that can be manipulated interactively by user.
-		//interactiveModel = models[0];
+	    //interactiveModel = models[0];
+
+		
 	}
 
 	/**
@@ -153,9 +159,10 @@ var app = ( function() {
 	 * @parameter fillstyle: wireframe, fill, fillwireframe.
 	 */
 	function createModel(geometryname, fillstyle, color, translate, rotate, scale) {
-		var model = {};
+	    var model = {};
 		model.fillstyle = fillstyle;
 		model.color = color;
+		
 		initDataAndBuffers(model, geometryname);
 		initTransformations(model, translate, rotate, scale);
 
@@ -238,7 +245,11 @@ var app = ( function() {
 			var sign = evt.shiftKey ? -1 : 1;
 
 			// Rotate interactiveModel.
-			switch(c) {
+			switch (c) {
+			    case ('W'):
+			        models[2].translate[2] += sign * deltaTranslate;
+			        models[3].translate[2] += -sign * deltaTranslate;
+			        break;
 				case('X'):
 					interactiveModel.rotate[0] += sign * deltaRotate;
 					break;
@@ -251,11 +262,11 @@ var app = ( function() {
 			}
 			// Scale/squeese interactiveModel.
 			switch(c) {
-				case('S'):
-					interactiveModel.scale[0] *= 1 + sign * deltaScale;
-					interactiveModel.scale[1] *= 1 - sign * deltaScale;
-					interactiveModel.scale[2] *= 1 + sign * deltaScale;
-					break;
+				//case('S'):
+				//	interactiveModel.scale[0] *= 1 + sign * deltaScale;
+				//	interactiveModel.scale[1] *= 1 - sign * deltaScale;
+				//	interactiveModel.scale[2] *= 1 + sign * deltaScale;
+				//	break;
 			}
 			// Change projection of scene.
 			switch(c) {
@@ -294,7 +305,16 @@ var app = ( function() {
 					camera.lrtb += sign * 0.1;
 					break;
 			}
-			// Render the scene again on any key pressed.
+
+		    // shader options.
+			switch (c) {
+			    case('M'):
+			        prog.zBufferVisualizationMode = 3 - prog.zBufferVisualizationMode;
+			        console.log(prog.zBufferVisualizationMode);
+			    	break;
+			}
+
+		    // Render the scene again on any key pressed.
 			render();
 		};
 	}
@@ -370,6 +390,7 @@ var app = ( function() {
 
 		// Translate.
 		mat4.translate(mMatrix, mMatrix, model.translate);
+
 		// Rotate.
 		mat4.rotateX(mMatrix, mMatrix, model.rotate[0]);
 		mat4.rotateY(mMatrix, mMatrix, model.rotate[1]);

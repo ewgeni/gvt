@@ -25,20 +25,36 @@
 				
 				vec3 tNormal = uNMatrix * aNormal;
                 
-				vColor = uColor;
+                vColor = uColor;
 			}
 		</script>
 		<script type="x-shader/x-fragment" id="fragmentshader">
 			precision mediump float;
              
+            uniform int uZBufferVisualizationMode;
+
 			varying vec4 vColor;
+            float zBufferValue;
+
+            float linearizeDepth() {
+                float nearPlane = 1.;
+                float farPlane = 10.;
+                
+                return (2.0 * nearPlane) / (farPlane + nearPlane - gl_FragCoord.z * (farPlane - nearPlane));
+            }
 
 			void main() {
-                gl_FragColor = vColor;
+
+               zBufferValue = linearizeDepth();
+               gl_FragColor = vec4(zBufferValue, zBufferValue, zBufferValue, 1);
 			}
 		</script>
 	</head>
 	<body onload="app.start()">
 		<canvas id="canvas" width="500" height="500"></canvas>
+        <div>
+            <div style="display: inline-block; width: 50%;"><img src="images/w_key.png" /></div>
+            <div style="display: inline-block; width: 50%;"> Kugeln bewegen</div>
+        </div>
 	</body>
 </html>
