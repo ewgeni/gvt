@@ -42,10 +42,17 @@ var app = (function() {
     var illumination = {
         ambientLight : [ .5, .5, .5 ],
         light : [ {
-            isOn : true,
-            position : [ 3., 1., 3. ],
-            color : [ 1., 1., 1. ]
-        }, ]
+                    isOn : true,
+                    position : [ 3., 1., 3. ],
+                    color : [ 1., 1., 1. ]
+                  },
+                  {
+                      isOn: true,
+                      position: [-3., 1, -3],
+                      color: [1., 1., 1.] 
+                  }
+
+        ]
     };
 
     function start() {
