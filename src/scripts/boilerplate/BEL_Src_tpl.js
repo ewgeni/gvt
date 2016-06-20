@@ -14,7 +14,7 @@ var app = (function() {
 
     var camera = {
         // Initial position of the camera.
-        eye : [ 0, 1, 4 ],
+        eye : [ 0, 2, 4 ],
         // Point to look at.
         center : [ 0, 0, 0 ],
         // Roll and pitch of the camera.
@@ -40,16 +40,17 @@ var app = (function() {
 
     // Objekt with light sources characteristics in the scene.
     var illumination = {
-        ambientLight : [ .5, .5, .5 ],
+        ambientLight: [0.5, 0.5, 0.5],
+        movement : 0,
         light : [ {
                     isOn : true,
-                    position : [ 3., 1., 3. ],
-                    color : [ 1., 1., 1. ]
+                    position : [ 6., 0., 0. ],
+                    color: [1., 1., 1.]
                   },
                   {
                       isOn: true,
-                      position: [-3., 1, -3],
-                      color: [1., 1., 1.] 
+                      position: [-6., 0, 0],
+                      color: [1., 1., 1.]
                   }
 
         ]
@@ -195,19 +196,22 @@ var app = (function() {
 
         // Create some default material.
         var mDefault = createPhongMaterial();
-        var materialPlane = createPhongMaterial({ambientLight: [0.7, 0.7, 0.7], diffuseLight: [0.5, 0.5, 0.5], specularLight: [0.,0.,0.], shininess: 0});
+        var materialPlane = createPhongMaterial({shininess: 100});
         var materialTorus = createPhongMaterial({ diffuseLight: [1., 0., 0.] });
         var materialSphere1 = createPhongMaterial({ diffuseLight: [0., 1., 0.] });
         var materialSphere2 = createPhongMaterial({ diffuseLight: [0., 0., 1.] });
 
-        createModel("torus", fs, [ 1, 1, 1, 1 ], [ 0, .75, 0 ],
-                [ 0, 0, 0, 0 ], [ 1, 1, 1, 1 ], materialTorus);
-        createModel("sphere", fs, [ 1, 1, 1, 1 ], [ -1.25, .5, 0 ], [ 0, 0,
-                0, 0], [.5, .5, .5], materialSphere1);
-        createModel("sphere", fs, [ 1, 1, 1, 1 ], [ 1.25, .5, 0 ], [ 0, 0,
-                0, 0], [.5, .5, .5], materialSphere2);
-        createModel("plane", fs, [ 1, 1, 1, 1 ], [ 0, 0, 0, 0 ], [ 0, 0, 0,
-                0], [1, 1, 1, 1], materialPlane);
+        createModel("torus", fs, [1, 1, 1, 1], [0, .75, 0], [0, 0, 0, 0],
+            [1, 1, 1, 1], materialTorus);
+
+        createModel("sphere", fs, [1, 1, 1, 1], [-1.25, .5, 0], [0, 0, 0, 0],
+            [.5, .5, .5], materialSphere1);
+
+        createModel("sphere", fs, [1, 1, 1, 1], [1.25, .5, 0], [0, 0, 0, 0],
+            [.5, .5, .5], materialSphere2);
+
+        createModel("plane", fs, [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0],
+            [1, 1, 1, 1], materialPlane);
 
         // Select one model that can be manipulated interactively by user.
         interactiveModel = models[0];
@@ -364,6 +368,9 @@ var app = (function() {
                 // Camera near plane dimensions.
                 camera.lrtb += sign * 0.1;
                 break;
+            case ('L'):
+                illumination.movement += sign * deltaRotate;
+                break;
             }
             // Render the scene again on any key pressed.
             render();
@@ -394,6 +401,7 @@ var app = (function() {
                     illumination.light[j].isOn);
             // Tranform light postion in eye coordinates.
             // Copy current light position into a new array.
+
             var lightPos = [].concat(illumination.light[j].position);
             // Add homogenious coordinate for transformation.
             lightPos.push(1.0);
@@ -488,6 +496,10 @@ var app = (function() {
 
         // Calculate normal matrix from model matrix.
         mat3.normalFromMat4(model.nMatrix, mvMatrix);
+    }
+
+    function updateLightTransformation() {
+
     }
 
     function draw(model) {
