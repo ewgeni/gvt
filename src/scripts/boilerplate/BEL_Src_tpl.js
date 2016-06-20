@@ -195,7 +195,7 @@ var app = (function() {
 
         // Create some default material.
         var mDefault = createPhongMaterial();
-        var materialPlane = createPhongMaterial({ambientLight: [0.3, 0.3, 0.3], diffuseLight: [0.3, 0.3, 0.3], specularLight: [0.,0.,0.], shininess: 0});
+        var materialPlane = createPhongMaterial({ambientLight: [0.7, 0.7, 0.7], diffuseLight: [0.5, 0.5, 0.5], specularLight: [0.,0.,0.], shininess: 0});
         var materialTorus = createPhongMaterial({ diffuseLight: [1., 0., 0.] });
         var materialSphere1 = createPhongMaterial({ diffuseLight: [0., 1., 0.] });
         var materialSphere2 = createPhongMaterial({ diffuseLight: [0., 0., 1.] });
