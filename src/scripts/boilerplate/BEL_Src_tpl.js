@@ -177,14 +177,14 @@ var app = (function() {
      * @paramter material : objekt with optional ka, kd, ks, ke.
      * @retrun material : objekt with ka, kd, ks, ke.
      */
-    function createPhongMaterial(material) {
-        material = material || {};
+    function createPhongMaterial(aMaterial) {
+        material = aMaterial || {};
         // Set some default values,
         // if not defined in material paramter.
-        material.ka = material.ka || [ 0.3, 0.3, 0.3 ];
-        material.kd = material.kd || [ 0.6, 0.6, 0.6 ];
-        material.ks = material.ks || [ 0.8, 0.8, 0.8 ];
-        material.ke = material.ke || 10.;
+        material.ka = material.ambientLight || [0.3, 0.3, 0.3];
+        material.kd = material.diffuseLight || [0.6, 0.6, 0.6];
+        material.ks = material.specularLight || [0.8, 0.8, 0.8];
+        material.ke = material.shininess || 10.;
 
         return material;
     }
@@ -195,15 +195,19 @@ var app = (function() {
 
         // Create some default material.
         var mDefault = createPhongMaterial();
+        var materialPlane = createPhongMaterial({ambientLight: [0.3, 0.3, 0.3], diffuseLight: [0.3, 0.3, 0.3], specularLight: [0.,0.,0.], shininess: 0});
+        var materialTorus = createPhongMaterial({ diffuseLight: [1., 0., 0.] });
+        var materialSphere1 = createPhongMaterial({ diffuseLight: [0., 1., 0.] });
+        var materialSphere2 = createPhongMaterial({ diffuseLight: [0., 0., 1.] });
 
         createModel("torus", fs, [ 1, 1, 1, 1 ], [ 0, .75, 0 ],
-                [ 0, 0, 0, 0 ], [ 1, 1, 1, 1 ], mDefault);
+                [ 0, 0, 0, 0 ], [ 1, 1, 1, 1 ], materialTorus);
         createModel("sphere", fs, [ 1, 1, 1, 1 ], [ -1.25, .5, 0 ], [ 0, 0,
-                0, 0 ], [ .5, .5, .5 ], mDefault);
+                0, 0], [.5, .5, .5], materialSphere1);
         createModel("sphere", fs, [ 1, 1, 1, 1 ], [ 1.25, .5, 0 ], [ 0, 0,
-                0, 0 ], [ .5, .5, .5 ], mDefault);
+                0, 0], [.5, .5, .5], materialSphere2);
         createModel("plane", fs, [ 1, 1, 1, 1 ], [ 0, 0, 0, 0 ], [ 0, 0, 0,
-                0 ], [ 1, 1, 1, 1 ], mDefault);
+                0], [1, 1, 1, 1], materialPlane);
 
         // Select one model that can be manipulated interactively by user.
         interactiveModel = models[0];
