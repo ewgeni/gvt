@@ -45,15 +45,27 @@ var app = (function() {
         light : [ {
                     isOn : true,
                     position : [ 6., 0., 0. ],
-                    color: [1., 1., 1.]
+                    color: [1., 1., 1.],
+                    mMatrix: mat4.create(),
+                    mvMatrix: mat4.create()
                   },
                   {
-                      isOn: true,
-                      position: [-6., 0, 0],
-                      color: [1., 1., 1.]
+                    isOn: true,
+                    position: [-6., 0, 0],
+                    color: [1., 1., 1.],
+                    mMatrix: mat4.create(),
+                    mvMatrix: mat4.create(),
                   }
-
         ]
+    };
+
+    function invertVec3(vec3) {
+        var invertedVec3 = [];
+        for (var i = 0; i < vec3.length; i++) {
+            invertedVec3[i] = vec3[i] * -1;
+        }
+
+        return invertedVec3;
     };
 
     function start() {
@@ -396,19 +408,31 @@ var app = (function() {
         gl.uniform3fv(prog.ambientLightUniform, illumination.ambientLight);
         // Loop over light sources.
         for (var j = 0; j < illumination.light.length; j++) {
+
             // bool is transferred as integer.
-            gl.uniform1i(prog.lightUniform[j].isOn,
-                    illumination.light[j].isOn);
+            gl.uniform1i(prog.lightUniform[j].isOn, illumination.light[j].isOn);
             // Tranform light postion in eye coordinates.
             // Copy current light position into a new array.
 
             var lightPos = [].concat(illumination.light[j].position);
+
+            mat4.identity(illumination.light[j].mMatrix);
+            var invertedVec3 = invertVec3(lightPos);
+
+            mat4.translate(illumination.light[j].mMatrix, illumination.light[j].mMatrix, invertedVec3);
+            mat4.rotateY(illumination.light[j].mMatrix, illumination.light[j].mMatrix, illumination.movement);
+            mat4.translate(illumination.light[j].mMatrix, illumination.light[j].mMatrix, lightPos);
+
+            mat4.multiply(illumination.light[j].mvMatrix, camera.vMatrix, illumination.light[j].mMatrix);
+
+
             // Add homogenious coordinate for transformation.
             lightPos.push(1.0);
-            vec4.transformMat4(lightPos, lightPos, camera.vMatrix);
+            vec4.transformMat4(lightPos, lightPos, illumination.light[j].mvMatrix);
             // Remove homogenious coordinate.
             lightPos.pop();
             gl.uniform3fv(prog.lightUniform[j].position, lightPos);
+
             gl.uniform3fv(prog.lightUniform[j].color,
                     illumination.light[j].color);
         }
