@@ -11,15 +11,15 @@ var plane = ( function() {
 		// Normals.
 		this.normals = new Float32Array(3 * (n + 1) * (m + 1));
 		var normals = this.normals;
-
-		// Texture coordinates (2D).
-		this.textureCoord = new Float32Array(2 * (n + 1) * (m + 1));
-		var textureCoord = this.textureCoord;
 		// Index data.
 		this.indicesLines = new Uint16Array(2 * 2 * n * m);
 		var indicesLines = this.indicesLines;
 		this.indicesTris = new Uint16Array(3 * 2 * n * m);
 		var indicesTris = this.indicesTris;
+
+	    // Texture data.
+		this.textureCoord = new Float32Array(2 * (n + 1) * (m + 1));
+		var textureCoord = this.textureCoord;
 
 		var du = 20 / n;
 		var dv = 20 / m;
@@ -47,10 +47,10 @@ var plane = ( function() {
 				normals[iVertex * 3] = 0;
 				normals[iVertex * 3 + 1] = 1;
 				normals[iVertex * 3 + 2] = 0;
-				
-				// Set texture coordinate.
-				textureCoord[iVertex * 2] = (u+10)/20; // s
-				textureCoord[iVertex * 2 + 1] = (v+10)/20; // t
+
+			    // Set teture coordinate.
+				textureCoord[iVertex * 2] = (u + 10) / 20;
+				textureCoord[iVertex * 2 + 1] = (v + 10) / 20;
 
 				// Set index.
 				// Line on beam.
@@ -81,7 +81,7 @@ var plane = ( function() {
 
 	return {
 		createVertexData : createVertexData
-	};
+	}
 
 }());
 //END exercise plane
