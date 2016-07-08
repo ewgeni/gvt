@@ -388,17 +388,19 @@ var app = (function () {
 
                 texture.image);
 
+        //create mip map
+        gl.generateMipmap(gl.TEXTURE_2D);
 
 
         // Set texture parameter.
 
         // Min Filter: NEAREST,LINEAR, .. , LINEAR_MIPMAP_LINEAR,
 
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 
         // Mag Filter: NEAREST,LINEAR
 
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
         // Use mip-Mapping.
 
@@ -417,8 +419,6 @@ var app = (function () {
         render();
 
     }
-
-
 
     /**
 
@@ -506,7 +506,7 @@ var app = (function () {
 
         createModel("plane", fs, [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0,
 
-                0], [1, 1, 1, 1], mGrey, "src/textures/earth_surface.jpg");
+                0], [1, 1, 1, 1], mGrey, "src/textures/x.png");
 
 
 
@@ -530,9 +530,7 @@ var app = (function () {
 
      */
 
-    function createModel(geometryname, fillstyle, color, translate, rotate,
-
-            scale, material, textureFilename) {
+    function createModel(geometryname, fillstyle, color, translate, rotate, scale, material, textureFilename) {
 
         var model = {};
 
