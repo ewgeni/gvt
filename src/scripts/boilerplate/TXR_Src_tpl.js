@@ -388,8 +388,9 @@ var app = (function () {
 
                 texture.image);
 
-        //create mip map
-        gl.generateMipmap(gl.TEXTURE_2D);
+        //use tex mirroring
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT);
 
 
         // Set texture parameter.
