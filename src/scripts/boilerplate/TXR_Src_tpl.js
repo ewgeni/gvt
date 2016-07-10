@@ -389,8 +389,8 @@ var app = (function () {
                 texture.image);
 
         //use tex mirroring
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT);
+        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT);
+        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT);
 
 
         // Set texture parameter.
@@ -507,7 +507,7 @@ var app = (function () {
 
         createModel("plane", fs, [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0,
 
-                0], [1, 1, 1, 1], mGrey, "src/textures/x.png");
+                0], [1, 1, 1, 1], mGrey, "src/textures/Grass_03_UV_H_CM_1_128.png");
 
 
 
